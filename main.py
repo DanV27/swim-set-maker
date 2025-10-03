@@ -4,72 +4,53 @@
 This script asks for a swim level and a desired yard target.
 """
 
-# Redo warm_ups dictionary to match the structure of main_sets
-warm_ups = {
-    "beginner": {
-        100: ["100 EASY", "100 IM"],
-        150: ["50 SWIM/KICK/PULL", "3x50 EZ"]
-    },
-    "intermediate": {
-        200: ["200 EASY"],
-        300: ["100 SWIM/KICK/PULL", "3x100 EZ"]
-    },
-    "advanced": {
-        200: ["200 EASY"],
-        500: ["500 EASY"],
-        600: ["200 SWIM/KICK/PULL"]
-    }
-}
+from data import warm_ups, cool_downs, drills, main_sets
+import random
 
-cool_downs = {
-    "beginner": {
-        50: ["50 COOL DOWN"],
-        100: ["100 EASY"]
-    },
-    "intermediate": {
-        100: ["100 COOL DOWN"],
-        50: ["50 EASY"]
-    },
-    "advanced": {
-        200: ["200 COOL DOWN"],
-        100: ["100 EASY"]
-    }
-}
 
-drills = {
-    "beginner": {
-        200: ["2x100 ZIPPER DRILL", "2x100 CATCH-UP DRILL", "2x100 KICKBOARD", "2x100 STREAMLINE KICK"]
-    },
-    "intermediate": {
-        200: ["2x100 ZIPPER DRILL", "2x100 CATCH-UP DRILL", "2x100 KICKBOARD", "2x100 STREAMLINE KICK", "2x100 3-3-3"],
-        400: ["4x100 FINGER-TIP DRILL", "4x100 ZIPPER DRILL", "4x100 CATCH-UP DRILL", "4x100 KICKBOARD", "4x100 STREAMLINE KICK", "4x100 3-3-3"]
-    },
-    "advanced": {
-        400: ["4x100 FINGER-TIP DRILL", "4x100 ZIPPER DRILL", "4x100 CATCH-UP DRILL", "4x100 KICKBOARD", "4x100 STREAMLINE KICK", "4x100 3-3-3", "4x100 2KICK-1PULL", "4x100 6-KICK SWITCH"],
-        500: ["5x100 FINGER-TIP DRILL", "5x100 ZIPPER DRILL", "5x100 CATCH-UP DRILL"]
-    }
-}
-# Add a dictionary to store main sets categorized by levels and yard targets
-main_sets = {
-    "beginner": {
-        500: ["5x100 @ 2:00", "5x50 @ 1:30"],
-        1000: ["10x100 @ 2:00", "10x50 @ 1:30"],
-        1500: ["15x100 @ 2:00", "15x50 @ 1:30"],
-        2000: ["20x100 @ 2:00", "20x50 @ 1:30"]
-    },
-    "intermediate": {
-        500: ["5x100 @ 1:45", "5x50 @ 1:15"],
-        1000: ["10x100 @ 1:45", "10x50 @ 1:15"],
-        1500: ["15x100 @ 1:45", "15x50 @ 1:15"],
-        2000: ["20x100 @ 1:45", "20x50 @ 1:15"]
-    },
-    "advanced": {
-        500: ["5x100 @ 1:30", "5x50 @ 1:00"],
-        1000: ["10x100 @ 1:30", "10x50 @ 1:00"],
-        1500: ["15x100 @ 1:30", "15x50 @ 1:00"],
-        2000: ["20x100 @ 1:30", "20x50 @ 1:00"]
-    }
-}
+def generate_simple_set(level: str, yards: int):
+    """Return a tuple (warmup_desc, main_desc, cooldown_desc) for the given level and yards.
+
+    - warmup: pick the smallest warmup available for level
+    - main: pick the main_sets[level][yards] first entry if present, else choose closest smaller key
+    - cooldown: pick the smallest cooldown available for level
+    """
+    lvl = level.lower()
+    # Warmup
+    warm_options = warm_ups.get(lvl, {})
+    if warm_options:
+        warm_key = min(warm_options.keys())
+        warm_desc = random.choice(warm_options[warm_key])
+    else:
+        warm_key = 0
+        warm_desc = "200 easy"
+
+    # Main set selection
+    mains = main_sets.get(lvl, {})
+    if yards in mains:
+        key = yards
+        main_desc = random.choice(mains[yards])
+    else:
+        # pick the largest main key <= yards, otherwise pick the smallest available
+        smaller_keys = [k for k in mains.keys() if k <= yards]
+        if smaller_keys:
+            key = max(smaller_keys)
+        elif mains:
+            key = min(mains.keys())
+        else:
+            key = yards
+        main_desc = random.choice(mains[key]) if mains else f"{yards} swim"
+
+    # Cooldown
+    cool_options = cool_downs.get(lvl, {})
+    if cool_options:
+        cool_key = min(cool_options.keys())
+        cool_desc = random.choice(cool_options[cool_key])
+    else:
+        cool_key = 0
+        cool_desc = "100 easy"
+
+    return (warm_key, warm_desc), (key, main_desc), (cool_key, cool_desc)
 
 def prompt_swim_info():
     print("Welcome to Swimset!")
@@ -99,7 +80,14 @@ def main():
         return
 
     print(f"\nYou selected: Level = {level.capitalize()}, Yards = {yards}")
-    print("Thank you for using Swimset!")
+    warm, main, cool = generate_simple_set(level, yards)
+
+    print("\nGenerated simple set:")
+    print(f"\nWARMUP: {warm[1]} ({warm[0]} yds)")
+    print(f"MAIN: {main[1]} ({main[0]} yds)")
+    print(f"COOLDOWN: {cool[1]} ({cool[0]} yds)")
+
+    print("\nThank you for using Swimset!")
 
 if __name__ == "__main__":
     main()
