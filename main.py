@@ -6,6 +6,7 @@ This script asks for a swim level and a desired yard target.
 
 from data import warm_ups, cool_downs, drills, main_sets
 import random
+import argparse
 
 
 def generate_simple_set(level: str, yards: int):
@@ -72,12 +73,34 @@ def prompt_swim_info():
 
     return level, yards
 
+def parse_args():
+    p = argparse.ArgumentParser(description="Swimset CLI")
+    p.add_argument("--level", choices=["beginner", "intermediate", "advanced"],
+                   help="swimmer level (non-interactive)")
+    p.add_argument("--yards", type=int, choices=[500, 1000, 1500, 2000],
+                   help="desired total yards (non-interactive)")
+    p.add_argument("--seed", type=int, help="random seed for deterministic output")
+    p.add_argument("--no-input", action="store_true",
+                   help="fail if required flags are not provided (no interactive prompts)")
+    return p.parse_args()
+
+
 def main():
-    try:
-        level, yards = prompt_swim_info()
-    except (EOFError, KeyboardInterrupt):
-        print("\nInput cancelled.")
+    args = parse_args()
+    if args.seed is not None:
+        random.seed(args.seed)
+
+    if args.level and args.yards:
+        level, yards = args.level, args.yards
+    elif args.no_input:
+        print("Non-interactive mode requires --level and --yards")
         return
+    else:
+        try:
+            level, yards = prompt_swim_info()
+        except (EOFError, KeyboardInterrupt):
+            print("\nInput cancelled.")
+            return
 
     print(f"\nYou selected: Level = {level.capitalize()}, Yards = {yards}")
     warm, main, cool = generate_simple_set(level, yards)
