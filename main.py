@@ -110,6 +110,9 @@ def main():
     print(f"MAIN: {main[1]} ({main[0]} yds)")
     print(f"COOLDOWN: {cool[1]} ({cool[0]} yds)")
 
+    total = (warm[0] or 0) + (main[0] or 0) + (cool[0] or 0)
+    print(f"\nTotal: {total} yds")
+
     print("\nThank you for using Swimset!")
 
 if __name__ == "__main__":
