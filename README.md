@@ -1,38 +1,52 @@
-# Swim Project
+# Swim Set Maker
 
-Small CLI to generate swim sets (warmup, main, cooldown) based on swimmer level and yard target.
+Generate swim sets (warmup, main, cooldown) from simple building blocks.
 
-Files
-- `main.py` - CLI and simple set generator.
-- `data.py` - workout building blocks (warmups, main sets, drills, cooldowns).
+Features
+- Simple CLI with interactive and non-interactive modes
+- Streamlit demo UI (`app.py`)
+- Deterministic generation via `--seed`
 
 Quick start
 
-Run interactively:
+Clone and install dependencies:
+
+```bash
+git clone https://github.com/DanV27/swim-set-maker.git
+cd swim-set-maker
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Run the CLI (interactive):
 
 ```bash
 python3 main.py
 ```
 
-Example session:
+Run non-interactive (example):
 
-```
-Welcome to Swimset!
-Are you a beginner, intermediate, or advanced swimmer? intermediate
-Choose your desired swim yards:
-Options: 500, 1000, 1500, 2000
-Enter your desired swim yards: 1000
-
-Generated simple set:
-
-WARMUP: 200 EASY (200 yds)
-MAIN: 10x100 @ 1:45 (1000 yds)
-COOLDOWN: 50 EASY (50 yds)
+```bash
+python3 main.py --level intermediate --yards 1000 --seed 42
 ```
 
-Next steps
-- Add unit tests for the generator.
-- Make generation deterministic / seedable or add CLI flags (`--level`, `--yards`).
-- Improve matching logic (split main sets to better fit targets).
+Run the Streamlit UI:
 
-License: MIT
+```bash
+streamlit run app.py
+```
+
+Files
+- `main.py` - CLI and generator
+- `data.py` - warmups, main sets, drills, and cooldowns
+- `app.py` - minimal Streamlit UI
+- `requirements.txt` - Python deps for the UI
+
+Contributing
+
+Open an issue or PR for desired improvements (more data variations, smarter splitting, tests).
+
+License
+
+MIT
