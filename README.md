@@ -1,5 +1,7 @@
 # Swim Set Maker
 
+![Swim image](./swim.png)
+
 Generate swim sets (warmup, main, cooldown) from simple building blocks.
 
 Features
