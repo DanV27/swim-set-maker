@@ -67,3 +67,10 @@ main_sets = {
         2000: ["20x100 @ 1:30", "20x50 @ 1:00"]
     }
 }
+
+# Small building blocks to allow composing arbitrary totals
+small_blocks = {
+    100: ["100 SWIM"],
+    50: ["50 SWIM"],
+    25: ["25 SWIM"],
+}
